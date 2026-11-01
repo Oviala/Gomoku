@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>五子棋 · 正在进入</title>
+<style>
+  :root { color-scheme: dark; }
+  body {
+    margin: 0; min-height: 100vh; display: grid; place-items: center;
+    background: radial-gradient(900px 600px at 50% 30%, #4a2412, #150b04 72%);
+    color: #f2d98a; font-family: "Songti SC", "STSong", serif; text-align: center;
+  }
+  .box { padding: 30px 22px; }
+  h1 { font-size: 34px; letter-spacing: 12px; text-indent: 12px; margin: 0 0 12px; }
+  p { color: #bda98a; font-size: 13px; letter-spacing: 2px; line-height: 2; margin: 6px 0; }
+  .spinner {
+    width: 30px; height: 30px; margin: 26px auto 0; border-radius: 50%;
+    border: 2px solid rgba(242, 217, 138, 0.22); border-top-color: #f2d98a;
+    animation: spin 0.9s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  a { color: #f2d98a; }
+  #manual { display: none; }
+</style>
+</head>
+<body>
+  <div class="box">
+    <h1>五子棋</h1>
+    <p id="tip">正在进入棋局…</p>
+    <div class="spinner" id="spin"></div>
+    <p id="manual">跳转失败？<a id="link" href="#">点这里手动进入</a></p>
+  </div>
+
+<script>
+  /* ============================================================
+   * 房主注意：隧道地址变了，只改下面这一行，然后提交到 GitHub。
+   * 可以用 tools/set_link.sh 自动生成这一行。
+   * ============================================================ */
+  const TARGET = "https://REPLACE-ME.trycloudflare.com";
+
+  (function () {
+    const base = TARGET.replace(/\/+$/, "");
+    const url = base + "/" + location.search + location.hash;
+    const tip = document.getElementById("tip");
+    const manual = document.getElementById("manual");
+    const link = document.getElementById("link");
+    link.href = url;
+
+    if (TARGET.indexOf("REPLACE-ME") !== -1) {
+      tip.textContent = "房主还没配置地址";
+      document.getElementById("spin").style.display = "none";
+      manual.style.display = "block";
+      return;
+    }
+
+    location.replace(url);
+    // 3 秒还没跳走，就露出一个手动入口（隧道没开时用）
+    setTimeout(function () { manual.style.display = "block"; }, 3000);
+  })();
+</script>
+</body>
+</html>
