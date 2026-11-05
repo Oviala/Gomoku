@@ -22,6 +22,7 @@
   @keyframes spin { to { transform: rotate(360deg); } }
   a { color: #f2d98a; }
   #manual { display: none; }
+  #manual a { display: block; font-size: 12px; word-break: break-all; }
 </style>
 </head>
 <body>
@@ -29,34 +30,84 @@
     <h1>五子棋</h1>
     <p id="tip">正在进入棋局…</p>
     <div class="spinner" id="spin"></div>
-    <p id="manual">跳转失败？<a id="link" href="#">点这里手动进入</a></p>
+    <p id="manual">跳转失败？<span id="links"></span></p>
   </div>
 
 <script>
   /* ============================================================
-   * 房主注意：隧道地址变了，只改下面这一行，然后提交到 GitHub。
-   * 可以用 tools/set_link.sh 自动生成这一行。
+   * 房主注意：这一行由 tools/set_link.sh 自动维护 —— 最近几个隧道地址，
+   * 越新越靠前；页面会逐个探测 /api/health，挑一个活的跳过去。
+   * 一般不用手改；真要手改，保持 ["url1", "url2"] 这种格式即可。
    * ============================================================ */
-  const TARGET = "https://77786199f0d423.lhr.life";
+  const TARGETS = ["https://77786199f0d423.lhr.life"];
 
   (function () {
-    const base = TARGET.replace(/\/+$/, "");
-    const url = base + "/" + location.search + location.hash;
-    const tip = document.getElementById("tip");
-    const manual = document.getElementById("manual");
-    const link = document.getElementById("link");
-    link.href = url;
+    var tip = document.getElementById("tip");
+    var manual = document.getElementById("manual");
+    var links = document.getElementById("links");
+    var spinner = document.getElementById("spin");
+    var suffix = location.search + location.hash;
+    var bases = (TARGETS || [])
+      .map(function (t) { return String(t || "").trim().replace(/\/+$/, ""); })
+      .filter(function (t) { return /^https?:\/\//.test(t) && t.indexOf("REPLACE-ME") === -1; });
 
-    if (TARGET.indexOf("REPLACE-ME") !== -1) {
+    // 手动兜底：把候选地址都列出来，隧道全挂时至少能自己试
+    links.innerHTML = "";
+    bases.forEach(function (base, i) {
+      var a = document.createElement("a");
+      a.href = base + "/" + suffix;
+      a.textContent = (i === 0 ? "最新地址 " : "备用地址 ") + base;
+      links.appendChild(a);
+    });
+
+    if (!bases.length) {
       tip.textContent = "房主还没配置地址";
-      document.getElementById("spin").style.display = "none";
+      spinner.style.display = "none";
       manual.style.display = "block";
       return;
     }
 
-    location.replace(url);
-    // 3 秒还没跳走，就露出一个手动入口（隧道没开时用）
-    setTimeout(function () { manual.style.display = "block"; }, 3000);
+    function probe(base) {
+      // 探测隧道是否活着（服务端给了 CORS，跨域也能读）
+      return new Promise(function (resolve) {
+        var ctl = window.AbortController ? new AbortController() : null;
+        var timer = setTimeout(function () {
+          if (ctl) ctl.abort();
+          resolve(false);
+        }, 2500);
+        fetch(base + "/api/health?_=" + Date.now(), {
+          mode: "cors",
+          cache: "no-store",
+          signal: ctl ? ctl.signal : undefined,
+        })
+          .then(function (r) { return r.ok ? r.json() : null; })
+          .then(function (j) {
+            clearTimeout(timer);
+            resolve(!!(j && j.ok));
+          })
+          .catch(function () {
+            clearTimeout(timer);
+            resolve(false);
+          });
+      });
+    }
+
+    (async function () {
+      for (var i = 0; i < bases.length; i++) {
+        tip.textContent = i === 0 ? "正在进入棋局…" : "最新地址没响应，试备用地址…";
+        if (await probe(bases[i])) {
+          location.replace(bases[i] + "/" + suffix);
+          return;
+        }
+      }
+      // 都探测失败：可能是探测被网络/跨域挡住，但页面本身能开 —— 直接试最新的
+      tip.textContent = "正在尝试最新地址…";
+      location.replace(bases[0] + "/" + suffix);
+      setTimeout(function () {
+        spinner.style.display = "none";
+        manual.style.display = "block";
+      }, 4000);
+    })();
   })();
 </script>
 </body>
