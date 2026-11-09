@@ -2577,14 +2577,27 @@ class BoardView {
     });
   }
 
+  function makeRoomCode() {
+    var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    var out = '';
+    for (var i = 0; i < 4; i++) out += chars[Math.floor(Math.random() * chars.length)];
+    return out;
+  }
+
+  /* 直接落到「房间内」：房号放路径里（serveo 警告页会丢 query、但保留路径），
+     在线版识别 /r/<房号> 后直接进对局，不会再停在首页。 */
+  function onlineRoomURL() {
+    return API_BASE + '/r/' + makeRoomCode();
+  }
+
   function gotoOnline() {
-    if (serverOk === true) { location.href = API_BASE + '/'; return; }
+    if (serverOk === true) { location.href = onlineRoomURL(); return; }
     setServerState('checking', '联机服务：正在重试…');
     checkServer().then(function (ok) {
       serverOk = ok;
       if (ok) {
-        setServerState('ok', '联机服务：可用，正在进入…');
-        location.href = API_BASE + '/';
+        setServerState('ok', '联机服务：可用，正在进入房间…');
+        location.href = onlineRoomURL();
       } else {
         setServerState('bad', '联机服务：失效（房主电脑没开机）');
         toast('服务器失效，先玩人机吧');
