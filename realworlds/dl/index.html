@@ -191,7 +191,7 @@
 
   $('btn-download').addEventListener('click', function () {
     $('btn-download').disabled = true;
-    say('panel-msg', '正在准备文件，11 MB 可能要等十几秒…');
+    say('panel-msg', '正在准备文件，11 MB 可能要等十几秒；网络差就多点几次，不会多扣');
     request('/download').then(function (r) {
       if (!r.ok) {
         return asJson(r).then(function (j) {
@@ -213,7 +213,7 @@
       });
     }).catch(function () {
       $('btn-download').disabled = false;
-      say('panel-msg', '网络超时，再点一次「下载」就行（不会重复扣次数）', 'err');
+      say('panel-msg', '网络超时，再点一次「下载」就行（2 分钟内重试不扣次数）', 'err');
     });
   });
 
