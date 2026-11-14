@@ -1,0 +1,20 @@
+[
+  {
+    "file": "natsu-demo.zip",
+    "title": "夏日尾声",
+    "engine": "renpy",
+    "tag": "Ren'Py · 推荐先试这个"
+  },
+  {
+    "file": "kirikiri-demo.zip",
+    "title": "蝉时雨",
+    "engine": "kirikiri",
+    "tag": "KiriKiri · data.xp3 封包"
+  },
+  {
+    "file": "ons-demo.zip",
+    "title": "夏の栞",
+    "engine": "ons",
+    "tag": "ONScripter · 0.txt 脚本"
+  }
+]
