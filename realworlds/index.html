@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="midnight">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>REALWORLDS · galgame 播放器</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css?v=r2">
+</head>
+<body data-screen="library">
+
+<svg class="sprite-defs" aria-hidden="true" width="0" height="0">
+  <defs>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5 21 21"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.56V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.11-1.56 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.56-1H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.6 8.9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 8.96 4.6 1.7 1.7 0 0 0 10 3.04V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V8.9a1.7 1.7 0 0 0 1.56 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1.1Z"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.5v15l13-7.5-13-7.5Z"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-7.5-9.4A4.1 4.1 0 0 1 12 7.6a4.1 4.1 0 0 1 7.5 3C19.5 15.4 12 20 12 20Z"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1.4"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.4"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.4"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.4"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M4.5 7h15M4.5 12h15M4.5 17h15"/></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="M14.5 5.5 8 12l6.5 6.5"/></symbol>
+    <symbol id="i-expand" viewBox="0 0 24 24"><path d="M9 4.5H4.5V9M15 4.5h4.5V9M9 19.5H4.5V15M15 19.5h4.5V15"/></symbol>
+    <symbol id="i-history" viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.4-5.7M4 4v4.5h4.5"/><path d="M12 8.5V12l2.6 1.8"/></symbol>
+    <symbol id="i-auto" viewBox="0 0 24 24"><path d="M6 5.5v13M12 5.5v13M18 5.5v13"/><path d="M3 11h2M9 11h2M15 11h2M21 11h0"/></symbol>
+    <symbol id="i-skip" viewBox="0 0 24 24"><path d="M5.5 6l8 6-8 6V6Z"/><path d="M17 6v12"/></symbol>
+    <symbol id="i-save" viewBox="0 0 24 24"><path d="M5 4.5h11l3.5 3.5v11.5a1 1 0 0 1-1 1H5.5a1 1 0 0 1-1-1V5.5a1 1 0 0 1 1-1Z"/><path d="M8 4.5v5h7v-5M8 20.5v-6h8v6"/></symbol>
+    <symbol id="i-load" viewBox="0 0 24 24"><path d="M5 9.5h13.5L21 20H2.5L5 9.5Z"/><path d="M8 9.5V4.5h8V9.5"/></symbol>
+    <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3.5 7.5a1 1 0 0 1 1-1h5l2 2.5h8a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1h-15a1 1 0 0 1-1-1v-11.5Z"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 4.5l2.3 4.9 5.2.7-3.8 3.7.9 5.2-4.6-2.5-4.6 2.5.9-5.2L4.5 10l5.2-.7L12 4.5Z"/></symbol>
+    <symbol id="i-torii" viewBox="0 0 32 32"><path d="M5 9h22M8.5 9v4M23.5 9v4M12 13v13M20 13v13M6.5 15.5h19"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4.5 7h15M9.5 7V4.5h5V7M6.5 7l1 13h9l1-13"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v4.5h-4.5"/></symbol>
+    <symbol id="i-box" viewBox="0 0 24 24"><path d="M3.5 7.5 12 3l8.5 4.5v9L12 21l-8.5-4.5v-9Z"/><path d="M3.5 7.5 12 12l8.5-4.5M12 12v9"/></symbol>
+    <symbol id="i-sparkle" viewBox="0 0 24 24"><path d="M12 3.5l1.8 5.2 5.2 1.8-5.2 1.8L12 17.5l-1.8-5.2L5 10.5l5.2-1.8L12 3.5Z"/></symbol>
+  </defs>
+</svg>
+
+<div class="ambient" aria-hidden="true"><i class="b1"></i><i class="b2"></i><i class="b3"></i></div>
+<div class="grain" aria-hidden="true"></div>
+
+<!-- ==================== 游戏库 ==================== -->
+<div class="shell" id="library">
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark"><svg class="ic"><use href="#i-torii"/></svg></span>
+      <span class="brand-text"><b>REALWORLDS</b><em>galgame library</em></span>
+    </div>
+    <nav class="tabs" id="tabs">
+      <button class="tab active" data-filter="all">游戏库</button>
+      <button class="tab" data-filter="recent">最近</button>
+      <button class="tab" data-filter="fav">收藏</button>
+      <button class="tab" data-filter="done">已读完</button>
+    </nav>
+    <div class="top-actions">
+      <label class="search">
+        <svg class="ic"><use href="#i-search"/></svg>
+        <input id="search" placeholder="搜索游戏 / 引擎 / 标签" spellcheck="false" autocomplete="off">
+        <kbd>⌘K</kbd>
+      </label>
+      <button class="icon-btn" id="btn-native" title="本机解压导入（大包推荐）"><svg class="ic"><use href="#i-box"/></svg></button>
+      <button class="icon-btn" id="btn-import-folder" title="导入游戏文件夹（不用压缩）"><svg class="ic"><use href="#i-folder"/></svg></button>
+      <button class="icon-btn" id="btn-settings" title="设置"><svg class="ic"><use href="#i-settings"/></svg></button>
+      <button class="btn primary" id="btn-import"><svg class="ic"><use href="#i-plus"/></svg>导入游戏</button>
+    </div>
+  </header>
+
+  <main class="page">
+    <section class="hero" id="hero"></section>
+
+    <section class="shelf" id="shelf">
+      <div class="shelf-head">
+        <div class="shelf-title"><h2>书架</h2><span class="count" id="lib-count">0</span></div>
+        <div class="shelf-tools">
+          <div class="chips" id="chips">
+            <button class="chip active" data-filter="all">全部</button>
+            <button class="chip" data-filter="recent">继续阅读</button>
+            <button class="chip" data-filter="fav">收藏</button>
+            <button class="chip" data-filter="done">已读完</button>
+          </div>
+          <button class="sort" id="sort">最近游玩<svg class="ic"><use href="#i-chevron"/></svg></button>
+          <div class="view-toggle" id="view-toggle">
+            <button class="active" data-view="grid" title="网格"><svg class="ic"><use href="#i-grid"/></svg></button>
+            <button data-view="list" title="列表"><svg class="ic"><use href="#i-list"/></svg></button>
+          </div>
+        </div>
+      </div>
+      <div class="cards" id="cards"></div>
+      <div class="card-list" id="card-list" hidden></div>
+    </section>
+
+    <section class="stats" id="stats"></section>
+
+    <section class="empty-state" id="empty" hidden>
+      <div class="empty-art"><span class="empty-glyph">栞</span></div>
+      <h2>书架还是空的</h2>
+      <p>把 galgame 的<b>压缩包</b>或<b>整个游戏文件夹</b>直接拖进来（zip / rar / 7z / tar.gz / lz4 都行），<br>不用先压缩，也可以先试试内置演示。</p>
+      <div class="empty-actions">
+        <button class="btn primary lg" id="btn-import-2"><svg class="ic"><use href="#i-plus"/></svg>导入压缩包</button>
+        <button class="btn ghost lg" id="btn-native-2"><svg class="ic"><use href="#i-box"/></svg>本机解压（大包推荐）</button>
+        <button class="btn ghost lg" id="btn-folder-2"><svg class="ic"><use href="#i-folder"/></svg>选择游戏文件夹</button>
+        <button class="btn ghost lg" id="btn-demos"><svg class="ic"><use href="#i-sparkle"/></svg>安装内置演示</button>
+      </div>
+      <p class="empty-hint" id="storage-hint"></p>
+    </section>
+  </main>
+</div>
+
+<!-- ==================== 播放器 ==================== -->
+<div class="player" id="player" hidden>
+  <div class="stage" id="stage">
+    <div class="stage-bg" id="stage-bg">
+      <img class="stage-photo" id="bg-img" alt="" hidden>
+      <div class="bg-stars"></div>
+      <div class="bg-sun"></div>
+      <div class="bg-hills h1"></div>
+      <div class="bg-hills h2"></div>
+      <div class="bg-town"></div>
+      <div class="bg-hills h3"></div>
+      <div class="bg-hills h4"></div>
+      <div class="bg-bokeh"></div>
+      <div class="bg-petals"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="bg-grain"></div>
+    </div>
+    <div class="stage-sprites" id="sprites"></div>
+    <div class="shade top"></div>
+    <div class="shade bottom"></div>
+
+    <div class="stage-top">
+      <button class="icon-btn glass" id="btn-exit" title="返回游戏库"><svg class="ic"><use href="#i-back"/></svg></button>
+      <div class="scene-title"><h1 id="p-title">—</h1><span id="p-chapter"></span></div>
+      <div class="stage-meta">
+        <div class="pbar mini"><i id="p-progress-bar" style="width:0%"></i></div>
+        <span class="pnum" id="p-progress-text">0%</span>
+        <button class="icon-btn glass" id="btn-fullscreen" title="全屏"><svg class="ic"><use href="#i-expand"/></svg></button>
+        <button class="icon-btn glass" id="btn-player-settings" title="设置"><svg class="ic"><use href="#i-settings"/></svg></button>
+      </div>
+    </div>
+
+    <div class="dialogue" id="dialogue">
+      <div class="nameplate" id="nameplate" hidden></div>
+      <p class="line" id="line"></p>
+      <div class="dlg-controls">
+        <button data-act="backlog" title="回放 (H)"><svg class="ic"><use href="#i-history"/></svg><em>回放</em></button>
+        <button data-act="auto" title="自动 (A)"><svg class="ic"><use href="#i-auto"/></svg><em>自动</em></button>
+        <button data-act="skip" title="快进 (Ctrl)"><svg class="ic"><use href="#i-skip"/></svg><em>快进</em></button>
+        <button data-act="save" title="存档"><svg class="ic"><use href="#i-save"/></svg><em>存档</em></button>
+        <button data-act="load" title="读档"><svg class="ic"><use href="#i-load"/></svg><em>读档</em></button>
+        <button data-act="settings" title="设置"><svg class="ic"><use href="#i-settings"/></svg><em>设置</em></button>
+      </div>
+      <div class="next-hint" id="next-hint">▼</div>
+    </div>
+
+    <div class="choices" id="choices" hidden></div>
+    <div class="chapter-toast" id="chapter-toast" hidden></div>
+    <div class="player-badges" id="player-badges"></div>
+    <div class="end-card" id="end-card" hidden>
+      <div class="end-inner">
+        <div class="end-eyebrow">READ COMPLETE</div>
+        <h2>这一段读完了</h2>
+        <p id="end-meta"></p>
+        <div class="end-actions">
+          <button class="btn primary" data-act="to-library">返回游戏库</button>
+          <button class="btn ghost" data-act="restart">从头再来</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 详情页 ==================== -->
+<div class="detail" id="detail" hidden></div>
+
+<!-- ==================== 浮动层 ==================== -->
+<div id="modals"></div>
+<div class="toasts" id="toasts"></div>
+
+<div class="import-panel" id="import-panel" hidden>
+  <div class="ip-head"><span class="ip-title" id="ip-title">正在导入…</span><button class="icon-btn" id="ip-close"><svg class="ic"><use href="#i-close"/></svg></button></div>
+  <div class="pbar"><i id="ip-bar" style="width:2%"></i></div>
+  <div class="ip-msg" id="ip-msg">解压中…</div>
+</div>
+
+<div class="drop-overlay" id="drop-overlay" hidden>
+  <div class="drop-card">
+    <svg class="ic"><use href="#i-box"/></svg>
+    <b>松开即可导入</b>
+    <span>压缩包（zip / rar / 7z / tar.gz / lz4）或整个游戏文件夹都可以，嵌套压缩包会自动解开</span>
+  </div>
+</div>
+
+<input type="file" id="file-input" multiple hidden>
+<input type="file" id="folder-input" webkitdirectory directory multiple hidden>
+
+<script type="module" src="js/app.js?v=r2"></script>
+</body>
+</html>
