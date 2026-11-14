@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>下载中心 · REALWORLDS</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230d0b0a'/%3E%3Cpath d='M14 20h36M18 20v26M46 20v26M24 26h16M24 33h16M24 40h16' stroke='%23f2d98a' stroke-width='3' stroke-linecap='round' fill='none'/%3E%3C/svg%3E">
+<style>
+  :root{
+    color-scheme: dark;
+    --bg:#0d0b0a; --line:rgba(242,217,138,.16);
+    --gold:#f2d98a; --text:#f4ece0; --muted:#9d9186; --dim:#6f665d;
+    --ok:#7ddc9c; --err:#ff8a7a;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{
+    margin:0; min-height:100svh; display:flex; flex-direction:column;
+    background:
+      radial-gradient(900px 500px at 50% -10%, rgba(242,217,138,.10), transparent 60%),
+      radial-gradient(700px 420px at 85% 110%, rgba(120,160,255,.08), transparent 60%),
+      var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    padding:max(20px, env(safe-area-inset-top)) 18px max(20px, env(safe-area-inset-bottom));
+  }
+  .head{text-align:center; margin:18px 0 24px}
+  .brand{font-size:11px; letter-spacing:.34em; color:var(--dim); text-indent:.34em}
+  .title{font-size:25px; letter-spacing:.2em; text-indent:.2em; margin:10px 0 0; color:var(--gold); font-weight:600}
+  .sub{font-size:12.5px; color:var(--muted); letter-spacing:.06em; margin-top:10px; line-height:1.75}
+  .card{
+    width:100%; max-width:430px; margin:0 auto;
+    background:linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,.012));
+    border:1px solid var(--line); border-radius:20px; padding:22px 20px;
+    box-shadow:0 18px 50px rgba(0,0,0,.45);
+  }
+  label{display:block; font-size:12px; letter-spacing:.14em; color:var(--muted); margin-bottom:10px}
+  .field{display:flex; gap:10px}
+  input{
+    flex:1; min-width:0; background:#0b0908; border:1px solid rgba(242,217,138,.22);
+    border-radius:12px; color:var(--text); font-size:17px; letter-spacing:.12em;
+    padding:14px; outline:none; font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+    transition:border-color .18s, box-shadow .18s;
+  }
+  input::placeholder{color:#4c4640; letter-spacing:.1em}
+  input:focus{border-color:rgba(242,217,138,.55); box-shadow:0 0 0 3px rgba(242,217,138,.10)}
+  button{
+    border:0; border-radius:12px; padding:14px 18px; font-size:15px; font-weight:600;
+    background:linear-gradient(180deg,#f6e2a4,#e2c471); color:#221a0c; cursor:pointer;
+    white-space:nowrap; transition:transform .12s, filter .18s;
+  }
+  button:hover{filter:brightness(1.04)}
+  button:active{transform:translateY(1px)}
+  button:disabled{opacity:.55; cursor:not-allowed}
+  button.ghost{background:transparent; color:var(--muted); border:1px solid var(--line); font-weight:500}
+  .hint{font-size:12px; color:var(--dim); line-height:1.7; margin-top:14px}
+  .msg{font-size:13px; margin-top:14px; min-height:20px; line-height:1.6}
+  .msg.err{color:var(--err)}
+  .msg.ok{color:var(--ok)}
+  .panel{display:none}
+  .panel.show{display:block}
+  .stat{display:flex; align-items:baseline; justify-content:space-between; padding:14px 2px 6px}
+  .stat b{font-size:30px; color:var(--gold); font-weight:600}
+  .stat span{font-size:12px; color:var(--muted); letter-spacing:.08em}
+  .bar{height:6px; border-radius:99px; background:rgba(255,255,255,.07); overflow:hidden; margin:10px 2px 18px}
+  .bar i{display:block; height:100%; background:linear-gradient(90deg,#e2c471,#7ddc9c); border-radius:99px; transition:width .3s}
+  .row{display:flex; gap:10px; margin-top:6px}
+  .row button{flex:1}
+  .meta{font-size:11.5px; color:var(--dim); margin-top:16px; line-height:1.8}
+  .foot{margin-top:auto; text-align:center; font-size:11px; color:#4a443d; padding-top:28px}
+</style>
+</head>
+<body>
+  <div class="head">
+    <div class="brand">REALWORLDS</div>
+    <h1 class="title">下载中心</h1>
+    <div class="sub">输入兑换码后下载 · 每个码每天最多 3 次<br>离线包解压即用，断网也能看</div>
+  </div>
+
+  <div class="card panel show" id="login">
+    <label for="code">兑换码</label>
+    <div class="field">
+      <input id="code" inputmode="text" autocomplete="off" spellcheck="false" placeholder="RW-XXXX-XXXX" maxlength="24">
+      <button id="btn-login">验证</button>
+    </div>
+    <div class="msg" id="login-msg"></div>
+    <div class="hint">兑换码在闲鱼下单后自动发到聊天窗口；丢了可以凭订单号找我补。</div>
+  </div>
+
+  <div class="card panel" id="panel">
+    <label>今日下载额度</label>
+    <div class="stat"><b id="left">3</b><span id="left-note">/ 3 次</span></div>
+    <div class="bar"><i id="bar" style="width:0%"></i></div>
+    <div class="row">
+      <button id="btn-download">下载离线包</button>
+      <button id="btn-out" class="ghost">退出</button>
+    </div>
+    <div class="msg" id="panel-msg"></div>
+    <div class="meta" id="meta"></div>
+  </div>
+
+  <div class="foot">© OVIALA · 虚拟商品，兑换后不支持退款</div>
+
+<script>
+(function () {
+  var API = 'https://oviala-redeem.oviala.workers.dev';
+  var LIMIT = 3;
+  var KEY = 'rw_token';
+  var $ = function (id) { return document.getElementById(id); };
+
+  function say(el, text, kind) {
+    var n = $(el);
+    n.textContent = text || '';
+    n.className = 'msg' + (kind ? ' ' + kind : '');
+  }
+
+  function paint(left) {
+    left = Math.max(0, Math.min(LIMIT, left));
+    $('left').textContent = left;
+    $('bar').style.width = ((LIMIT - left) / LIMIT * 100) + '%';
+    $('left-note').textContent = left > 0 ? '/ ' + LIMIT + ' 次，24 点重置' : '今日额度已用完';
+    $('btn-download').disabled = left <= 0;
+  }
+
+  function showPanel(on) {
+    $('login').classList.toggle('show', !on);
+    $('panel').classList.toggle('show', on);
+  }
+
+  function token() { try { return localStorage.getItem(KEY) || ''; } catch (e) { return ''; } }
+  function setToken(t) { try { t ? localStorage.setItem(KEY, t) : localStorage.removeItem(KEY); } catch (e) {} }
+
+  /** 网络抖动时自动重试：workers.dev 在国内不是稳定线路 */
+  function request(path, opts, tries) {
+    tries = tries || 3;
+    var o = Object.assign({ cache: 'no-store' }, opts || {});
+    o.headers = Object.assign({}, o.headers || {});
+    var t = token();
+    if (t) o.headers.authorization = 'Bearer ' + t;
+    return fetch(API + path, o).catch(function (e) {
+      if (tries <= 1) throw e;
+      return new Promise(function (r) { setTimeout(r, 900); }).then(function () {
+        return request(path, opts, tries - 1);
+      });
+    });
+  }
+
+  function asJson(r) {
+    return r.json().catch(function () { return { error: 'server' }; });
+  }
+
+  var ERR = {
+    format: '兑换码格式不对，应该是 RW 开头的一串字母数字',
+    notfound: '没有这个兑换码，检查一下复制时有没有漏字符',
+    auth: '登录已失效，重新输一次兑换码',
+    rate: '操作太频繁，等一分钟再试',
+    limit: '今天 3 次已经用完了，明天再来',
+    file: '文件源暂时不可用，稍后重试或联系我',
+    server: '服务器开小差了，稍后再试'
+  };
+
+  function fail(el, code) { say(el, ERR[code] || '出错了，稍后再试', 'err'); }
+
+  $('btn-login').addEventListener('click', function () {
+    var code = $('code').value.trim();
+    if (!code) { say('login-msg', '先填兑换码', 'err'); return; }
+    $('btn-login').disabled = true;
+    say('login-msg', '验证中…');
+    request('/api/login', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ code: code })
+    }).then(asJson).then(function (j) {
+      $('btn-login').disabled = false;
+      if (!j.ok) { fail('login-msg', j.error); return; }
+      setToken(j.token || '');
+      showPanel(true);
+      paint(j.left);
+      $('meta').textContent = '已绑定兑换码 ' + String(j.code || code).replace(/^(.{4}).*(.{4})$/, '$1…$2') +
+        '；换浏览器后需要重新验证。';
+      say('panel-msg', '');
+    }).catch(function () {
+      $('btn-login').disabled = false;
+      say('login-msg', '网络不稳，点「验证」再试一次', 'err');
+    });
+  });
+
+  $('code').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') $('btn-login').click();
+  });
+
+  $('btn-download').addEventListener('click', function () {
+    $('btn-download').disabled = true;
+    say('panel-msg', '正在准备文件，11 MB 可能要等十几秒…');
+    request('/download').then(function (r) {
+      if (!r.ok) {
+        return asJson(r).then(function (j) {
+          $('btn-download').disabled = false;
+          fail('panel-msg', j.error);
+        });
+      }
+      return r.blob().then(function (b) {
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(b);
+        a.download = 'REALWORLDS.zip';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(function () { URL.revokeObjectURL(a.href); }, 8000);
+        $('btn-download').disabled = false;
+        request('/api/me').then(asJson).then(function (j) { if (j.ok) paint(j.left); });
+        say('panel-msg', '已开始下载', 'ok');
+      });
+    }).catch(function () {
+      $('btn-download').disabled = false;
+      say('panel-msg', '网络超时，再点一次「下载」就行（不会重复扣次数）', 'err');
+    });
+  });
+
+  $('btn-out').addEventListener('click', function () {
+    setToken('');
+    showPanel(false);
+    $('code').value = '';
+    say('login-msg', '');
+  });
+
+  // 回来时自动恢复登录状态
+  if (token()) {
+    request('/api/me').then(asJson).then(function (j) {
+      if (j && j.ok) { showPanel(true); paint(j.left); }
+      else { setToken(''); }
+    }).catch(function () {});
+  }
+})();
+</script>
+</body>
+</html>
