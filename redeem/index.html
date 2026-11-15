@@ -71,7 +71,7 @@
   function localCheck(code) {
     var raw = code.toUpperCase().replace(/[^A-Z0-9]/g, '');
     var prefix = raw.slice(0, 2);
-    if (!GAME[prefix]) return null;
+    if (!GAME[prefix]) return Promise.resolve({ ok: false, error: 'notfound' });
     return crypto.subtle.digest('SHA-256', new TextEncoder().encode(raw)).then(function (buf) {
       var hex = Array.from(new Uint8Array(buf)).map(function (b) { return b.toString(16).padStart(2, '0'); }).join('').slice(0, 20);
       return HASHES.indexOf(hex) >= 0 ? { ok: true, offline: true, name: GAME[prefix].name, url: GAME[prefix].url } : { ok: false, error: 'notfound' };
