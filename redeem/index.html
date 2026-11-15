@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>兑换中心 · OVIALA</title>
+<style>
+  :root{color-scheme:dark;--bg:#0d0b0a;--line:rgba(242,217,138,.16);--gold:#f2d98a;--text:#f4ece0;--muted:#9d9186;--dim:#6f665d;--ok:#7ddc9c;--err:#ff8a7a}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{margin:0;min-height:100svh;display:flex;flex-direction:column;background:radial-gradient(900px 500px at 50% -10%,rgba(242,217,138,.10),transparent 60%),var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB",sans-serif;padding:24px 18px}
+  .head{text-align:center;margin:18px 0 24px}
+  .brand{font-size:11px;letter-spacing:.34em;color:var(--dim);text-indent:.34em}
+  .title{font-size:25px;letter-spacing:.2em;text-indent:.2em;margin:10px 0 0;color:var(--gold);font-weight:600}
+  .sub{font-size:12.5px;color:var(--muted);margin-top:10px;line-height:1.75}
+  .card{width:100%;max-width:430px;margin:0 auto;background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.012));border:1px solid var(--line);border-radius:20px;padding:22px 20px;box-shadow:0 18px 50px rgba(0,0,0,.45)}
+  label{display:block;font-size:12px;letter-spacing:.14em;color:var(--muted);margin-bottom:10px}
+  .field{display:flex;gap:10px}
+  input{flex:1;min-width:0;background:#0b0908;border:1px solid rgba(242,217,138,.22);border-radius:12px;color:var(--text);font-size:17px;letter-spacing:.12em;padding:14px;outline:none;font-family:ui-monospace,Menlo,monospace}
+  input::placeholder{color:#4c4640}
+  input:focus{border-color:rgba(242,217,138,.55);box-shadow:0 0 0 3px rgba(242,217,138,.10)}
+  button{border:0;border-radius:12px;padding:14px 18px;font-size:15px;font-weight:600;background:linear-gradient(180deg,#f6e2a4,#e2c471);color:#221a0c;cursor:pointer;white-space:nowrap}
+  button:disabled{opacity:.55;cursor:not-allowed}
+  .msg{font-size:13px;margin-top:14px;min-height:20px;line-height:1.7}
+  .msg.err{color:var(--err)}.msg.ok{color:var(--ok)}
+  .hint{font-size:12px;color:var(--dim);line-height:1.7;margin-top:14px}
+  .result{display:none;margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+  .result.show{display:block}
+  .game{font-size:16px;color:var(--gold);margin-bottom:8px}
+  a.btn{display:block;text-align:center;text-decoration:none;border-radius:12px;padding:14px;font-weight:600;background:linear-gradient(180deg,#f6e2a4,#e2c471);color:#221a0c;margin-top:10px}
+  a.link{display:block;font-size:12px;color:var(--muted);word-break:break-all;margin-top:12px}
+  .foot{margin-top:auto;text-align:center;font-size:11px;color:#4a443d;padding-top:28px}
+</style>
+</head>
+<body>
+  <div class="head">
+    <div class="brand">OVIALA</div>
+    <h1 class="title">兑换中心</h1>
+    <div class="sub">输入兑换码后进入游戏<br>一个码只能兑换一次</div>
+  </div>
+
+  <div class="card">
+    <label for="code">兑换码</label>
+    <div class="field">
+      <input id="code" autocomplete="off" spellcheck="false" placeholder="GM-XXXX-XXXX / EF-XXXX-XXXX" maxlength="24">
+      <button id="go">兑换</button>
+    </div>
+    <div class="msg" id="msg"></div>
+    <div class="hint">兑换码在闲鱼下单后自动发到聊天窗口。<br>如果一直提示“网络不稳”，请稍后再试或联系店主。</div>
+
+    <div class="result" id="result">
+      <div class="game" id="gameName"></div>
+      <a class="btn" id="enter" href="#" target="_blank" rel="noopener">进入游戏</a>
+      <a class="link" id="pass" href="#"></a>
+    </div>
+  </div>
+
+  <div class="foot">© OVIALA · 虚拟商品，兑换后不支持退款</div>
+
+<script>
+(function () {
+  var API = 'https://oviala-redeem.oviala.workers.dev';
+  var $ = function (id) { return document.getElementById(id); };
+  var ERR = {
+    format: '兑换码格式不对，检查一下是不是漏字符了',
+    notfound: '没有这个兑换码，确认一下复制是否完整',
+    used: '这个码已经被兑换过了；找回入口请联系店主',
+    rate: '操作太频繁，等一分钟再试',
+    server: '服务器开小差了，稍后再试'
+  };
+
+  function say(t, kind) { var n = $('msg'); n.textContent = t || ''; n.className = 'msg' + (kind ? ' ' + kind : ''); }
+
+  $('go').addEventListener('click', function () {
+    var code = $('code').value.trim();
+    if (!code) { say('先填兑换码', 'err'); return; }
+    $('go').disabled = true;
+    say('兑换中…');
+    fetch(API + '/api/redeem', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ code: code })
+    }).then(function (r) {
+      return r.json().catch(function () { return { error: 'server' }; });
+    }).then(function (j) {
+      $('go').disabled = false;
+      if (!j.ok) { say(ERR[j.error] || '出错了，稍后再试', 'err'); return; }
+      say('兑换成功', 'ok');
+      $('gameName').textContent = j.name || '游戏';
+      $('enter').href = j.url || '#';
+      var pass = API + '/api/pass?token=' + (j.token || '');
+      $('pass').href = pass;
+      $('pass').textContent = '收藏这个长期有效的通行证链接：' + pass;
+      $('result').classList.add('show');
+    }).catch(function () {
+      $('go').disabled = false;
+      say('网络不稳，再点一次「兑换」；还不行就等几分钟', 'err');
+    });
+  });
+
+  $('code').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('go').click(); });
+})();
+</script>
+</body>
+</html>
