@@ -92,11 +92,15 @@
     if (!code) { say('先填兑换码', 'err'); return; }
     $('go').disabled = true;
     say('兑换中…');
+    var ctrl = new AbortController();
+    var timer = setTimeout(function () { ctrl.abort(); }, 6000);
     fetch(API + '/api/redeem', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ code: code })
+      body: JSON.stringify({ code: code }),
+      signal: ctrl.signal
     }).then(function (r) {
+      clearTimeout(timer);
       return r.json().catch(function () { return { error: 'server' }; });
     }).then(function (j) {
       $('go').disabled = false;
